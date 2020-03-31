@@ -35,6 +35,7 @@ public class PokedexAdapter
     private List<Pokemon> pokemon = new ArrayList<>();
     private List<Pokemon> filtered = pokemon;
     private RequestQueue requestQueue;
+    public static Pokemon currentPokemon;
 
     public static class PokedexViewHolder extends RecyclerView.ViewHolder {
         public LinearLayout containerView;
