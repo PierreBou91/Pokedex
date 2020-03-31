@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -24,6 +26,8 @@ public class PokemonActivity extends AppCompatActivity {
     private TextView type2TextView;
     private String url;
     private RequestQueue requestQueue;
+    public static boolean catched;
+    Button catchButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +47,7 @@ public class PokemonActivity extends AppCompatActivity {
     public void load() {
         type1TextView.setText("");
         type2TextView.setText("");
+        catchButton = findViewById(R.id.catch_button);
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
@@ -64,6 +69,7 @@ public class PokemonActivity extends AppCompatActivity {
                             type2TextView.setText(type);
                         }
                     }
+
                 } catch (JSONException e) {
                     Log.e("cs50", "Pokemon json error", e);
                 }
@@ -74,7 +80,16 @@ public class PokemonActivity extends AppCompatActivity {
                 Log.e("cs50", "Pokemon details error", error);
             }
         });
-
         requestQueue.add(request);
+    }
+
+    public void toggleCatch(View view) {
+        if (!PokemonActivity.catched){
+            PokemonActivity.catched = true;
+            catchButton.setText("Release !");
+        } else {
+            PokemonActivity.catched = false;
+            catchButton.setText("Catch !");
+        }
     }
 }
