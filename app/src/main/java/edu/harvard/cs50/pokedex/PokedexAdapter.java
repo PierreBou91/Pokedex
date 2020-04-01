@@ -35,6 +35,7 @@ public class PokedexAdapter
     private List<Pokemon> pokemon = new ArrayList<>();
     private List<Pokemon> filtered = pokemon;
     private RequestQueue requestQueue;
+    public static Pokemon currentPokemon;
 
     public static class PokedexViewHolder extends RecyclerView.ViewHolder {
         public LinearLayout containerView;
@@ -149,6 +150,7 @@ public class PokedexAdapter
     @Override
     public void onBindViewHolder(@NonNull PokedexViewHolder holder, int position) {
         Pokemon current = filtered.get(position);
+        PokemonActivity.currentPokemon = current;
         holder.textView.setText(current.getName());
         holder.containerView.setTag(current);
     }
