@@ -38,8 +38,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/catch_button"
-        android:text="Catch !"
         android:onClick="toggleCatch"
         android:padding="12dp"
         />
+        <!--android:text="Catch !"-->
+
 </LinearLayout>

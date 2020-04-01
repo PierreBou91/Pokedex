@@ -2,6 +2,7 @@ package edu.harvard.cs50.pokedex;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -40,6 +41,7 @@ public class PokemonActivity extends AppCompatActivity {
         numberTextView = findViewById(R.id.pokemon_number);
         type1TextView = findViewById(R.id.pokemon_type1);
         type2TextView = findViewById(R.id.pokemon_type2);
+        catchButton = findViewById(R.id.catch_button);
 
         load();
     }
@@ -47,7 +49,6 @@ public class PokemonActivity extends AppCompatActivity {
     public void load() {
         type1TextView.setText("");
         type2TextView.setText("");
-        catchButton = findViewById(R.id.catch_button);
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
@@ -80,15 +81,23 @@ public class PokemonActivity extends AppCompatActivity {
                 Log.e("cs50", "Pokemon details error", error);
             }
         });
+        if (getPreferences(Context.MODE_PRIVATE).getBoolean(nameTextView.toString(), false))
+        {
+            catchButton.setText("Release !");
+        } else {
+            catchButton.setText("Catch !");
+        }
         requestQueue.add(request);
     }
 
     public void toggleCatch(View view) {
         if (!PokemonActivity.catched){
             PokemonActivity.catched = true;
+            getPreferences(Context.MODE_PRIVATE).edit().putBoolean(nameTextView.toString(), true).commit();
             catchButton.setText("Release !");
         } else {
             PokemonActivity.catched = false;
+            getPreferences(Context.MODE_PRIVATE).edit().putBoolean(nameTextView.toString(), false).commit();
             catchButton.setText("Catch !");
         }
     }
