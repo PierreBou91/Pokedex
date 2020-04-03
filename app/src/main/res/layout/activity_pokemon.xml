@@ -40,7 +40,7 @@
         android:id="@+id/catch_button"
         android:onClick="toggleCatch"
         android:padding="12dp"
+        android:text="Catch !"
         />
-        <!--android:text="Catch !"-->
 
 </LinearLayout>

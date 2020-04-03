@@ -28,19 +28,28 @@ public class PokemonActivity extends AppCompatActivity {
     private TextView type2TextView;
     private String url;
     private RequestQueue requestQueue;
-    public boolean catched;
-    Button catchButton;
+    private boolean catched;
+    private TextView catchButton;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
 
-    private void releasePokemon(){
+    public void toggleCatch(View view) {
+        if (catched){
+            releasePokemon();
+
+        } else {
+            catchPokemon();
+        }
+    }
+
+    private void catchPokemon(){
         catched = true;
         catchButton.setText("Release !");
         editor.putBoolean(nameTextView.getText().toString(), true);
         editor.commit();
     }
 
-    private void catchPokemon(){
+    private void releasePokemon(){
         catched = false;
         catchButton.setText("Catch !");
         editor.remove(nameTextView.getText().toString());
@@ -94,7 +103,8 @@ public class PokemonActivity extends AppCompatActivity {
                     if (sharedPreferences.getBoolean(response.getString("name"), false)) {
                         catchPokemon();
                     } else {
-                        releasePokemon(); }
+                        releasePokemon();
+                    }
 
                 } catch (JSONException e) {
                     Log.e("cs50", "Pokemon json error", e);
@@ -107,14 +117,5 @@ public class PokemonActivity extends AppCompatActivity {
             }
         });
         requestQueue.add(request);
-    }
-
-    public void toggleCatch(View view) {
-        if (catched){
-            releasePokemon();
-
-        } else {
-            catchPokemon();
-        }
     }
 }

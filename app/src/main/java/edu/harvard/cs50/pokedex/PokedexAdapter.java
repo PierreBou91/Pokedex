@@ -64,7 +64,7 @@ public class PokedexAdapter
         loadPokemon();
     }
 
-    public void loadPokemon() {
+    private void loadPokemon() {
         String url = "https://pokeapi.co/api/v2/pokemon?limit=151";
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET
                 , url
