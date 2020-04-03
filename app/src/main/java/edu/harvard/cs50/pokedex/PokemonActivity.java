@@ -3,6 +3,7 @@ package edu.harvard.cs50.pokedex;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -27,8 +28,24 @@ public class PokemonActivity extends AppCompatActivity {
     private TextView type2TextView;
     private String url;
     private RequestQueue requestQueue;
-    public static boolean catched;
+    public boolean catched;
     Button catchButton;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+
+    private void releasePokemon(){
+        catched = true;
+        catchButton.setText("Release !");
+        editor.putBoolean(nameTextView.getText().toString(), true);
+        editor.commit();
+    }
+
+    private void catchPokemon(){
+        catched = false;
+        catchButton.setText("Catch !");
+        editor.remove(nameTextView.getText().toString());
+        editor.commit();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +59,10 @@ public class PokemonActivity extends AppCompatActivity {
         type1TextView = findViewById(R.id.pokemon_type1);
         type2TextView = findViewById(R.id.pokemon_type2);
         catchButton = findViewById(R.id.catch_button);
+        sharedPreferences = getApplicationContext()
+                .getSharedPreferences("Pokecatcher", 0);
+        editor = sharedPreferences.edit();
+        catched = false;
 
         load();
     }
@@ -70,6 +91,10 @@ public class PokemonActivity extends AppCompatActivity {
                             type2TextView.setText(type);
                         }
                     }
+                    if (sharedPreferences.getBoolean(response.getString("name"), false)) {
+                        catchPokemon();
+                    } else {
+                        releasePokemon(); }
 
                 } catch (JSONException e) {
                     Log.e("cs50", "Pokemon json error", e);
@@ -81,24 +106,15 @@ public class PokemonActivity extends AppCompatActivity {
                 Log.e("cs50", "Pokemon details error", error);
             }
         });
-        if (getPreferences(Context.MODE_PRIVATE).getBoolean(nameTextView.toString(), false))
-        {
-            catchButton.setText("Release !");
-        } else {
-            catchButton.setText("Catch !");
-        }
         requestQueue.add(request);
     }
 
     public void toggleCatch(View view) {
-        if (!PokemonActivity.catched){
-            PokemonActivity.catched = true;
-            getPreferences(Context.MODE_PRIVATE).edit().putBoolean(nameTextView.toString(), true).commit();
-            catchButton.setText("Release !");
+        if (catched){
+            releasePokemon();
+
         } else {
-            PokemonActivity.catched = false;
-            getPreferences(Context.MODE_PRIVATE).edit().putBoolean(nameTextView.toString(), false).commit();
-            catchButton.setText("Catch !");
+            catchPokemon();
         }
     }
 }
