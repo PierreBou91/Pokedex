@@ -4,10 +4,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -21,6 +25,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.net.URL;
+
 public class PokemonActivity extends AppCompatActivity {
     private TextView nameTextView;
     private TextView numberTextView;
@@ -28,10 +35,14 @@ public class PokemonActivity extends AppCompatActivity {
     private TextView type2TextView;
     private String url;
     private RequestQueue requestQueue;
+
     private boolean catched;
     private TextView catchButton;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
+
+    private ImageView pokeSprite;
+    private String spriteUrl;
 
     public void toggleCatch(View view) {
         if (catched){
@@ -72,6 +83,8 @@ public class PokemonActivity extends AppCompatActivity {
                 .getSharedPreferences("Pokecatcher", 0);
         editor = sharedPreferences.edit();
         catched = false;
+        pokeSprite = findViewById(R.id.pkm_img);
+
 
         load();
     }
@@ -100,11 +113,17 @@ public class PokemonActivity extends AppCompatActivity {
                             type2TextView.setText(type);
                         }
                     }
+
                     if (sharedPreferences.getBoolean(response.getString("name"), false)) {
                         catchPokemon();
                     } else {
                         releasePokemon();
                     }
+
+                    JSONObject spritesEntries = response.getJSONObject("sprites");
+                    spriteUrl = spritesEntries.getString("front_default");
+
+                    new DownloadSpriteTask().execute(spriteUrl);
 
                 } catch (JSONException e) {
                     Log.e("cs50", "Pokemon json error", e);
@@ -117,5 +136,24 @@ public class PokemonActivity extends AppCompatActivity {
             }
         });
         requestQueue.add(request);
+    }
+
+    private class DownloadSpriteTask extends AsyncTask<String, Void, Bitmap> {
+        @Override
+        protected Bitmap doInBackground(String... strings) {
+            try {
+                URL url = new URL(strings[0]);
+                return BitmapFactory.decodeStream(url.openStream());
+            }
+            catch (IOException e) {
+                Log.e("cs50", "Download sprite error", e);
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            pokeSprite.setImageBitmap(bitmap);
+        }
     }
 }
