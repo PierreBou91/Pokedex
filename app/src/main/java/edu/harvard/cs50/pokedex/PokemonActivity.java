@@ -44,6 +44,10 @@ public class PokemonActivity extends AppCompatActivity {
     private ImageView pokeSprite;
     private String spriteUrl;
 
+    private String urlDesc;
+    private TextView description;
+    private RequestQueue descRequest;
+
     public void toggleCatch(View view) {
         if (catched){
             releasePokemon();
@@ -78,12 +82,16 @@ public class PokemonActivity extends AppCompatActivity {
         numberTextView = findViewById(R.id.pokemon_number);
         type1TextView = findViewById(R.id.pokemon_type1);
         type2TextView = findViewById(R.id.pokemon_type2);
+
         catchButton = findViewById(R.id.catch_button);
         sharedPreferences = getApplicationContext()
                 .getSharedPreferences("Pokecatcher", 0);
         editor = sharedPreferences.edit();
         catched = false;
+
         pokeSprite = findViewById(R.id.pkm_img);
+        description = findViewById(R.id.Desc);
+        descRequest = Volley.newRequestQueue(getApplicationContext());
 
 
         load();
@@ -124,6 +132,38 @@ public class PokemonActivity extends AppCompatActivity {
                     spriteUrl = spritesEntries.getString("front_default");
 
                     new DownloadSpriteTask().execute(spriteUrl);
+
+                    urlDesc = "https://pokeapi.co/api/v2/pokemon-species/";
+                    urlDesc = urlDesc.concat(Integer.toString(response.getInt("id")));
+
+                    JsonObjectRequest request2 = new JsonObjectRequest(Request.Method.GET, urlDesc,
+                            null, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                JSONArray txtEntries = response.getJSONArray("flavor_text_entries");
+                                for (int i = 0; i < txtEntries.length(); i++){
+                                    JSONObject txtEntry = txtEntries.getJSONObject(i);
+                                    String language = txtEntry.getJSONObject("language").getString("name");
+                                    String desc = txtEntry.getString("flavor_text");
+
+                                    if (language.equals("en")){
+                                        description.setText(desc);
+                                        break;
+                                    }
+                                }
+
+                            } catch (JSONException e2) {
+                                Log.e("cs50", "Desc json error", e2);
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error2) {
+                            Log.e("cs50", "Desc details error", error2);
+                        }
+                    });
+                    descRequest.add(request2);
 
                 } catch (JSONException e) {
                     Log.e("cs50", "Pokemon json error", e);
